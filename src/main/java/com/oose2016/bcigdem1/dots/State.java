@@ -1,8 +1,9 @@
 package com.oose2016.bcigdem1.dots;
 
 /**
- * Created by mbugrahanc on 9/21/16.
+ * State model to display the current state of the game.
  */
+@SuppressWarnings("SameParameterValue")
 public class State {
     /**
      * The number of boxes that the red player owns.
@@ -15,6 +16,7 @@ public class State {
     /**
      * Either "WAITING_TO_START", "IN_PROGRESS", or "FINISHED"
      */
+    @SuppressWarnings("unused")
     private String state;
     /**
      * Either "RED", "BLUE", or "FINISHED"
@@ -49,26 +51,18 @@ public class State {
     }
 
     public void nextTurn() {
-        if (!isFinished()) {
-            whoseTurn = whoseTurn.equals("RED") ? "BLUE" : "RED";
-        }
+        whoseTurn = whoseTurn.equals("RED") ? "BLUE" : "RED";
     }
 
-    public String getState() {
-        return state;
+    public void updateState() {
+        if (redScore + blueScore == 16) {
+            state = "FINISHED";
+            whoseTurn = "FINISHED";
+        }
     }
 
     public String getWhoseTurn() {
         return whoseTurn;
-    }
-
-    public boolean isFinished() {
-        if (redScore + blueScore == 16) {
-            state = "FINISHED";
-            whoseTurn = "FINISHED";
-            return true;
-        }
-        return false;
     }
 }
 

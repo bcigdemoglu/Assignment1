@@ -12,7 +12,10 @@ import java.util.Collections;
 
 import static spark.Spark.*;
 
-public class BoardController {
+/**
+ * Controller.
+ */
+class BoardController {
 
     private static final String API_CONTEXT = "/dots/api";
 
@@ -34,7 +37,7 @@ public class BoardController {
         put(API_CONTEXT + "/games/:gameId", "application/json", (request, response) -> {
             try {
                 response.status(200);
-                return boardService.joinGame(request.params(":id"));
+                return boardService.joinGame(request.params(":gameId"));
             } catch (BoardService.BoardServiceException ex) {
                 logger.error(ex.getMessage());
                 response.status(Integer.parseInt(ex.getMessage().split(" ")[0]));
@@ -45,7 +48,7 @@ public class BoardController {
         post(API_CONTEXT + "/games/:gameId/hmove", "application/json", (request, response) -> {
             try {
                 response.status(200);
-                boardService.hmove(request.params(":id"), request.body());
+                boardService.hmove(request.params(":gameId"), request.body());
             } catch (BoardService.BoardServiceException ex) {
                 logger.error(ex.getMessage());
                 response.status(Integer.parseInt(ex.getMessage().split(" ")[0]));
@@ -56,7 +59,7 @@ public class BoardController {
         post(API_CONTEXT + "/games/:gameId/vmove", "application/json", (request, response) -> {
             try {
                 response.status(200);
-                boardService.vmove(request.params(":id"), request.body());
+                boardService.vmove(request.params(":gameId"), request.body());
             } catch (BoardService.BoardServiceException ex) {
                 logger.error(ex.getMessage());
                 response.status(Integer.parseInt(ex.getMessage().split(" ")[0]));
@@ -67,7 +70,7 @@ public class BoardController {
         get(API_CONTEXT + "/games/:gameId/board", "application/json", (request, response) -> {
             try {
                 response.status(200);
-                return boardService.getBoard(request.params(":id"));
+                return boardService.getBoard(request.params(":gameId"));
             } catch (BoardService.BoardServiceException ex) {
                 logger.error(ex.getMessage());
                 response.status(Integer.parseInt(ex.getMessage().split(" ")[0]));
@@ -78,7 +81,7 @@ public class BoardController {
         get(API_CONTEXT + "/games/:gameId/state", "application/json", (request, response) -> {
             try {
                 response.status(200);
-                return boardService.getState(request.params(":id"));
+                return boardService.getState(request.params(":gameId"));
             } catch (BoardService.BoardServiceException ex) {
                 logger.error(ex.getMessage());
                 response.status(Integer.parseInt(ex.getMessage().split(" ")[0]));

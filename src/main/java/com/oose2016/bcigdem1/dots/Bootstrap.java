@@ -6,16 +6,11 @@
 
 package com.oose2016.bcigdem1.dots;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static spark.Spark.*;
 
 public class Bootstrap {
     public static final String IP_ADDRESS = "localhost";
     public static final int PORT = 8080;
-
-    private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 
     public static void main(String[] args) throws Exception {
 
@@ -27,12 +22,8 @@ public class Bootstrap {
         staticFileLocation("/public");
 
         //Create the model instance and then configure and start the web service
-        try {
-            BoardService model = new BoardService();
-            new BoardController(model);
-        } catch (BoardService.BoardServiceException ex) {
-            logger.error("Failed to create a BoardService instance. Aborting");
-        }
+        BoardService model = new BoardService();
+        new BoardController(model);
     }
 
 }

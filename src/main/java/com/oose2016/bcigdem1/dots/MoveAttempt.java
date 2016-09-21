@@ -1,8 +1,9 @@
 package com.oose2016.bcigdem1.dots;
 
 /**
- * Created by mbugrahanc on 9/21/16.
+ * Move model to handle move requests.
  */
+@SuppressWarnings("unused")
 public class MoveAttempt {
 
     private String playerId;

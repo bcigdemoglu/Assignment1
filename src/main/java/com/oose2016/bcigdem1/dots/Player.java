@@ -1,17 +1,17 @@
 package com.oose2016.bcigdem1.dots;
 
 /**
- * Created by mbugrahanc on 9/20/16.
+ * Player model to keep track of player and game ids, as well as player Type.
  */
 public class Player {
-    private String playerId;
-    private String gameId;
-    private String playerType;
+    private final String playerId;
+    private final String playerType;
+    private final String gameId;
 
-    public Player(String playerId, String gameId, String playerType) {
+    public Player(String playerId, String playerType, String gameId) {
         this.playerId = playerId;
-        this.gameId = gameId;
         this.playerType = playerType;
+        this.gameId = gameId;
     }
 
     public String getPlayerId() {
@@ -20,10 +20,6 @@ public class Player {
 
     public String getPlayerType() {
         return playerType;
-    }
-
-    public String getGameId() {
-        return gameId;
     }
 
     @Override

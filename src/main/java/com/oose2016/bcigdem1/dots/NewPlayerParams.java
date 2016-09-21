@@ -3,17 +3,18 @@ package com.oose2016.bcigdem1.dots;
 import java.util.UUID;
 
 /**
- * Created by mbugrahanc on 9/20/16.
+ * Create a random player id. Use to handle new player requests.
  */
 public class NewPlayerParams {
     /**
      * playerId: <String>, player's ID (unique within the context of the game).
      */
-    private String playerId;
+    private final String playerId;
 
     /**
      * playerType: <String>, either "RED" or "BLUE"
      */
+    @SuppressWarnings("unused")
     private String playerType;
 
     public NewPlayerParams() {

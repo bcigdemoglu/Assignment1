@@ -1,21 +1,17 @@
 package com.oose2016.bcigdem1.dots;
 
 /**
- * Created by mbugrahanc on 9/21/16.
+ * Generic line model used to track moves.
  */
 public class Line {
-    private int row;
-    private int col;
-    private boolean filled;
+    private final int row;
+    private final int col;
+    private final boolean filled;
 
     public Line(int row, int col, boolean filled) {
         this.row = row;
         this.col = col;
         this.filled = filled;
-    }
-
-    public boolean isFilled() {
-        return filled;
     }
 
     @Override

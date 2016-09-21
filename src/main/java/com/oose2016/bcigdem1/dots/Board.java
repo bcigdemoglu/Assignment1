@@ -1,35 +1,29 @@
 package com.oose2016.bcigdem1.dots;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * Created by mbugrahanc on 9/21/16.
+ * The game board model.
  */
 public class Board {
 
     private static transient final int DIM = 5;
 
-    private HashSet<Line> horizontalLines;
-    private HashSet<Line> verticalLines;
-    private HashSet<Box> boxes;
+    private final HashSet<Line> horizontalLines;
+    private final HashSet<Line> verticalLines;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final HashSet<Box> boxes;
 
-    private transient boolean[][] dots = new boolean[DIM][DIM];
-    private transient Player[] players = new Player[2];
+    private final transient boolean[][] dots = new boolean[DIM][DIM];
+    private final transient ArrayList<Player> players;
     private transient int playersInGame = 0;
-    private transient State state;
+    private final transient State state;
 
-    /**
-     * gameId: <String>, the ID of the joined game.
-     */
-    private transient String gameId;
-
-    public Board(String gameId) {
+    public Board() {
         horizontalLines = new HashSet<>();
         verticalLines = new HashSet<>();
         boxes = new HashSet<>();
+        players = new ArrayList<>();
 
         for (int row = 0; row < DIM; row ++) {
             for (int col = 0; col < DIM; col++) {
@@ -53,28 +47,34 @@ public class Board {
 
             }
         }
-        this.gameId = gameId;
         this.state = new State();
     }
 
-    public boolean addPlayer(Player player) {
-        players[playersInGame++] = player;
-        return true;
+    /**
+     * @param player Player object
+     */
+    public void addPlayer(Player player) {
+        players.add(player);
+        playersInGame++;
     }
 
+    /**
+     * @return String color of the second player.
+     */
     public String getRemainingColor() {
-        return (players[0].getPlayerType().equals("BLUE")) ? "RED" : "BLUE";
+        return (players.get(0).getPlayerType().equals("BLUE")) ? "RED" : "BLUE";
     }
 
     public boolean checkPlayerInGame(String playerId) {
         for (Player p : players) {
-            if (playerId.equals(p.getPlayerId())) {
-                return true;
-            }
+            if (p.getPlayerId().equals(playerId)) { return true; }
         }
         return false;
     }
 
+    /**
+     * @return True if both players are already in game.
+     */
     public boolean isBoardFull() {
         return playersInGame == 2;
     }
@@ -119,20 +119,12 @@ public class Board {
 
         // Check complete right box if col + 1 < box dimensions
         if (col + 1 < DIM) {
-            if (dots[row][col + 1] && dots[row + 1][col + 1]) {
-                boxes.remove(new Box(row, col));
-                boxes.add(new Box(row, col, getPlayerById(playerId).getPlayerType()));
-                score++;
-            }
+            score += getBoxScore(row, col, playerId);
         }
 
         // Check complete left box if col - 1 >= 0
         if (col - 1 >= 0) {
-            if (dots[row][col - 1] && dots[row + 1][col - 1]) {
-                boxes.remove(new Box(row, col - 1));
-                boxes.add(new Box(row, col - 1, getPlayerById(playerId).getPlayerType()));
-                score++;
-            }
+            score += getBoxScore(row, col - 1, playerId);
         }
         return score;
 
@@ -155,23 +147,39 @@ public class Board {
 
         // Check complete lower box if row + 1 < box dimensions
         if (row + 1 < DIM) {
-            if (dots[row + 1][col] && dots[row + 1][col + 1]) {
-                boxes.remove(new Box(row, col));
-                boxes.add(new Box(row, col, getPlayerById(playerId).getPlayerType()));
-                score++;
-            }
+            score += getBoxScore(row, col, playerId);
         }
 
         // Check complete upper box if row - 1 >= 0
         if (row - 1 >= 0) {
-            if (dots[row - 1][col] && dots[row - 1][col + 1]) {
-                boxes.remove(new Box(row - 1, col));
-                boxes.add(new Box(row - 1, col, getPlayerById(playerId).getPlayerType()));
-                score++;
-            }
+            score += getBoxScore(row - 1, col, playerId);
         }
         return score;
 
+    }
+
+    private int getBoxScore(int row, int col, String playerId) {
+        if (checkBoxSides(row, col)) {
+            boxes.remove(new Box(row, col));
+            boxes.add(new Box(row, col, getPlayerById(playerId).getPlayerType()));
+            return 1;
+        }
+        return 0;
+    }
+
+    private boolean checkBoxSides(int row, int col) {
+        Box b = new Box(row, col);
+        // Check horizontal lines
+        ArrayList<Line> lineList = b.generateHorizontalLines();
+        for (Line l : lineList) {
+            if (!horizontalLines.contains(l)) { return false; }
+        }
+        // Check vertical lines
+        lineList = b.generateVerticalLines();
+        for (Line l : lineList) {
+            if (!verticalLines.contains(l)) { return false; }
+        }
+        return true;
     }
 
     private boolean insertLine(HashSet<Line> lineSet, String strRow, String strCol) {
@@ -190,14 +198,11 @@ public class Board {
     }
 
     public Player getPlayerById(String playerId) {
-        return playerId.equals(players[0].getPlayerId()) ? players[0] : players[1];
-    }
-
-    public String getGameId() {
-        return gameId;
+        return playerId.equals(players.get(0).getPlayerId()) ? players.get(0) : players.get(1);
     }
 
     public State getState() {
+        state.updateState();
         return state;
     }
 }

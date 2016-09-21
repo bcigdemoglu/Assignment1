@@ -8,22 +8,23 @@ package com.oose2016.bcigdem1.dots;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sql2o.Connection;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 
+/**
+ * Service.
+ */
 public class BoardService {
 
     private HashMap<String, Board> activeGames;
     private final Logger logger = LoggerFactory.getLogger(BoardService.class);
 
     /**
-     * Construct the model.
+     * Construct the model by creating a map of gameids and boards.
      */
-    public BoardService() throws BoardServiceException {
+    public BoardService() {
         activeGames = new HashMap<>();
     }
 
@@ -36,10 +37,10 @@ public class BoardService {
         NewPlayerParams newPlayerParams = new Gson().fromJson(body, NewPlayerParams.class);
         String createdGameId = UUID.randomUUID().toString();
 
-        Board newBoard = new Board(createdGameId);
+        Board newBoard = new Board();
         activeGames.put(createdGameId, newBoard);
-
-        Player p = new Player(newPlayerParams.getPlayerId(), createdGameId, newPlayerParams.getPlayerType());
+        logger.info(new Gson().toJson(activeGames));
+        Player p = new Player(newPlayerParams.getPlayerId(), newPlayerParams.getPlayerType(), createdGameId);
         newBoard.addPlayer(p);
         return p;
     }
@@ -58,8 +59,8 @@ public class BoardService {
             throw new BoardServiceException("404 BoardService.joinGame: Invalid game ID");
         }
 
-        Player p = new Player(newPlayerParams.getPlayerId(), gameId, board.getRemainingColor());
-        if (board.checkPlayerInGame(p.getPlayerId()) || board.isBoardFull()) {
+        Player p = new Player(newPlayerParams.getPlayerId(), board.getRemainingColor(), gameId);
+        if (board.isBoardFull() || board.checkPlayerInGame(p.getPlayerId())) {
             logger.error("BoardService.joinGame: Player already joined / game full");
             throw new BoardServiceException("410 BoardService.joinGame: Player already joined / game full");
         }
@@ -69,6 +70,11 @@ public class BoardService {
         return p;
     }
 
+    /**
+     * @param gameId Game id
+     * @param body Horizontal move request
+     * @throws BoardServiceException if move is not possible
+     */
     public void hmove(String gameId, String body) throws BoardServiceException {
         Board board = activeGames.get(gameId);
         if (board == null) {
@@ -102,6 +108,11 @@ public class BoardService {
         }
     }
 
+    /**
+     * @param gameId Game id
+     * @param body Vertical move request
+     * @throws BoardServiceException if move is not possible
+     */
     public void vmove(String gameId, String body) throws BoardServiceException {
         Board board = activeGames.get(gameId);
         if (board == null) {
@@ -135,6 +146,11 @@ public class BoardService {
         }
     }
 
+    /**
+     * @param gameId Game id
+     * @return State of the board
+     * @throws BoardServiceException Invalid game ID
+     */
     public Board getBoard(String gameId) throws BoardServiceException {
         Board board = activeGames.get(gameId);
         if (board == null) {
@@ -144,6 +160,11 @@ public class BoardService {
         return board;
     }
 
+    /**
+     * @param gameId Game id
+     * @return State of the game
+     * @throws BoardServiceException Invalid game ID
+     */
     public State getState(String gameId) throws BoardServiceException {
         Board board = activeGames.get(gameId);
         if (board == null) {
@@ -157,6 +178,9 @@ public class BoardService {
     // Helper Classes and Methods
     //-----------------------------------------------------------------------------//
 
+    /**
+     * Thrown when the game cannot proceed
+     */
     public static class BoardServiceException extends Exception {
         public BoardServiceException(String message) {
             super(message);
