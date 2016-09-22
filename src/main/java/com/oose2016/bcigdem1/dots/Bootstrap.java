@@ -15,8 +15,10 @@ public class Bootstrap {
     public static void main(String[] args) throws Exception {
 
         //Specify the IP address and Port at which the server should be run
-        ipAddress(IP_ADDRESS);
-        port(PORT);
+
+        int portValue = getHerokuAssignedPort();
+        if (portValue == PORT) { ipAddress(IP_ADDRESS); }
+        port(portValue);
 
         //Specify the sub-directory from which to serve static resources (like html and css)
         staticFileLocation("/public");
@@ -24,6 +26,14 @@ public class Bootstrap {
         //Create the model instance and then configure and start the web service
         BoardService model = new BoardService();
         new BoardController(model);
+    }
+
+    private static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return PORT; //return default port if heroku-port isn't set (i.e. on localhost)
     }
 
 }

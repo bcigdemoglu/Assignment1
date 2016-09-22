@@ -17,3 +17,6 @@ hs_err_pid*
 .idea/
 *.iml
 target/
+bcigdem1_assignment1.zip
+dependency-reduced-pom.xml
+src/test/
